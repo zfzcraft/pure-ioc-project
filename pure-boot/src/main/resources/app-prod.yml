@@ -1,0 +1,8 @@
+netty:
+  port: 18070
+datasource: 
+  hikari:
+    jdbcUrl: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: root
+    driverClassName: com.mysql.cj.jdbc.Driver
