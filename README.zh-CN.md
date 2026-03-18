@@ -1,6 +1,4 @@
 # Pure IOC
-[![zh-CN](https://img.shields.io/badge/lang-中文-blue)](README.zh-CN.md)
-[![en](https://img.shields.io/badge/lang-English-green)](README.md)
 
 Pure IOC 是面向云原生、深度适配 K8s 环境，从底层重新定义的新一代极简高性能 IOC 容器。
 

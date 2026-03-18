@@ -1,6 +1,5 @@
 # Pure IOC
 [![zh-CN](https://img.shields.io/badge/lang-中文-blue)](README.zh-CN.md)
-[![en](https://img.shields.io/badge/lang-English-green)](README.md)
 
 Pure IOC is a **new-generation, minimalist, high-performance IOC container redefined from the ground up, cloud-native oriented and deeply adapted for Kubernetes environments**.
 
