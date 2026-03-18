@@ -1,101 +1,79 @@
 # pure-ioc-project
-Pure IOC is a new-generation, minimalist and high-performance IOC container redefined from the ground up, cloud-native oriented and deeply adapted for Kubernetes environments.
-Pure IOC 是面向云原生、深度适配 K8s 环境，从底层重新定义的新一代极简高性能 IOC 容器。
+Pure IOC is a new-generation, minimalist, high-performance IOC container redefined from the ground up, cloud-native oriented and deeply optimized for Kubernetes environments.
 
-# Pure IOC 设计思想
-Pure IOC 是**面向云原生、深度适配 K8s 环境，从底层重新定义的新一代极简高性能 IOC 容器**。
-彻底抛弃传统框架臃肿冗余、黑盒复杂、侵入性强的设计糟粕，坚守**极简内核、透明可控、低内存、高并发、无黑魔法**的核心理念，只保留容器最本质的 Bean 管理与依赖注入能力，专为微服务、容器化、弹性调度、高并发低延迟场景打造稳定、简洁、可深度调试的轻量容器底座。
+# Pure IOC Design Philosophy
+Pure IOC is a **new-generation, minimalist, high-performance IOC container redefined from the ground up, cloud-native oriented and deeply adapted for Kubernetes environments**.
 
-1. **唯一容器架构，极简无嵌套**
+It completely abandons the bloated, redundant, black-box, complex, and highly intrusive designs of traditional frameworks, adhering to the core principles of **minimalist kernel, transparent controllability, low memory footprint, high concurrency, and no black magic**. It retains only the most essential Bean management and dependency injection capabilities, built as a stable, clean, and deeply debuggable lightweight container foundation for microservices, containerization, elastic scheduling, and high-concurrency, low-latency scenarios.
 
-全局仅存在**唯一一个 ApplicationContext**，无父子容器、无抽象分层、无多层容器嵌套，架构极致简洁、稳定透明、易维护、易排查。
+1. **Single Container Architecture, Minimalist Without Nesting**
+There is **only one global ApplicationContext**, with no parent-child containers, no abstract hierarchies, and no multi-layer container nesting. The architecture is extremely clean, stable, transparent, easy to maintain, and easy to troubleshoot.
 
-2. **全局单例作用域，云原生无状态标准**
+2. **Global Singleton Scope, Cloud-Native Stateless Standard**
+Following the stateless design principle of microservices, **only singleton scope is supported**. All redundant scope designs are removed, eliminating unnecessary object creation, resulting in extremely low memory usage and stable, efficient runtime.
 
-遵循微服务无状态设计原则，**仅支持单例作用域**，移除所有冗余作用域设计，杜绝无效对象创建，内存占用极低、运行稳定高效。
+3. **Minimalist BeanDefinition, No Redundant Complex Processing**
+Lightweight Bean metadata model, **no complex dependency checking, no dependency sorting, no redundant attribute logic**. Only core class information and instantiation rules are preserved, enabling faster startup, lower memory usage, and clearer logic.
 
-3. **极简 BeanDefinition，无冗余复杂处理**
+4. **Class as the Unique Identifier, Type-Safe and Unambiguous**
+Uses **Class as the unique identifier for Beans**, abandoning ambiguous byName and byType matching. For interfaces with a single implementation, use the interface Class; for multiple implementations, use the implementation Class. Fully type-safe, conflict-free, and unambiguous in configuration.
 
-Bean 元信息模型轻量化设计，**无复杂依赖检测、无依赖排序、无冗余属性逻辑**，仅保留最核心类信息与实例化规则，启动更快、内存更省、逻辑更清晰。
+5. **Pure Constructor Injection, No Lifecycle Callbacks**
+**Only constructor instantiation and dependency injection are supported**. Field injection and Setter injection are completely discarded. There are no initialization methods, no callbacks, and no lifecycle binding, fully complying with native Java specifications—clean and minimalist.
 
-4. **Class 作为唯一标识，类型安全无歧义**
+6. **Default Lazy Loading + Eager Loading for Core Components**
+Global default **lazy loading** enables container startup in seconds, perfectly adapting to Kubernetes fast scheduling and elastic scaling.
+For core infrastructure components such as **Servlet containers and Netty**, annotation-marked **eager loading** is supported to ensure core services are ready upon startup.
 
-以 **Class 作为 Bean 唯一标识**，摒弃 byName、byType 模糊匹配机制；接口单实现使用接口 Class，多实现使用实现类 Class，全类型安全、无冲突、无配置歧义。
+7. **Asynchronous Preheating After Startup, Balancing Startup Speed and Runtime Performance**
+After the container completes fast startup, it asynchronously preheats all Beans. This ensures ultra-fast startup in cloud-native environments while achieving zero-latency, high-performance runtime.
 
-5. **纯构造器注入，无任何生命周期回调**
+8. **Multi-Threaded Parallel Class Loading, Greatly Improving Startup Efficiency**
+For scenarios with large-scale class loading, multi-threaded parallel class loading is adopted, significantly reducing startup time for large applications with extreme performance optimization.
 
-**仅支持构造器实例化与依赖注入**，彻底废弃字段注入、Setter 注入，无初始化、无回调、无生命周期绑定，完全遵循 Java 原生规范，干净极简。
+9. **Zero Package Scanning at Runtime, Full Support for Framework and Plugins**
+Inefficient runtime package scanning is completely abandoned. Beans are defined via a **unified configuration file**, and a Bean index is automatically generated during the packaging phase. At runtime, the container initializes directly from the index with zero performance overhead, covering both the framework core and third-party plugins.
 
-6. **默认懒加载 + 核心组件急加载**
+10. **General Bean Extension Points, User-Defined Custom Extensions**
+Only the basic **BeanPostProcessor** extension point is provided; the framework does not include any built-in enhancement logic.
+Capabilities such as AOP, dynamic proxy, transactions, and logging interception are all implemented by users based on this extension point—fully open, without fixed logic.
 
-全局默认**懒加载**，实现容器秒级启动，完美适配 K8s 快速调度、弹性扩缩容；
-针对 **Servlet 容器、Netty** 等基础核心组件，支持注解标记**急加载**，保证核心服务启动即就绪。
+11. **Environment Configuration Loading Extension: EnvironmentLoader**
+Provides a standard EnvironmentLoader extension point, supporting environment configuration loading from local and remote configuration centers, natively adapting to cloud-native configuration systems.
 
-7. **启动后异步预热，兼顾启动速度与运行性能**
+12. **Configuration Post-Processing Extension: EnvironmentPostProcessor**
+After configuration loading is complete, custom enhancements such as encryption, decryption, masking, property replacement, and merging are supported, offering strong extensibility.
 
-容器完成快速启动后，异步预热全量 Bean，既保证云原生环境下极速启动，又实现运行时零延迟、高性能。
+13. **Unified Specification for All Extension Points: No-Arg Constructor Instantiation**
+All extension interfaces in the framework are created using a **no-arg constructor**, with controllable, clean instantiation and no dependency injection intrusion, ensuring extremely high stability.
 
-8. **Class 多线程并行加载，大幅提升启动效率**
+14. **Automatic Configuration Binding, Type-Safe Mapping**
+Built-in automatic configuration binding and safe type conversion, supporting multi-environment and standardized configuration management to meet enterprise-level production usage.
 
-针对大批量类加载场景，采用多线程并行加载 Class，显著缩短大型应用启动耗时，性能极致优化。
+15. **JDK Native SPI, Plugin-Based Auto-Assembly**
+Implements plugin discovery, conditional loading, and auto-assembly based on JDK native SPI mechanism, with no third-party dependencies—stable, universal, and lightweight.
 
-9. **运行时零扫包，框架与插件全支持**
+16. **Graceful Shutdown, No Redundant Destruction Ordering**
+Natively supports graceful shutdown without complex and meaningless Bean destruction ordering. Each object manages resource release independently—minimalist, practical, and without over-engineering.
 
-彻底弃用低效运行时包扫描，通过**统一配置文件定义 Bean**，打包阶段自动生成 Bean 索引；运行时直接读取索引初始化，全程无性能损耗，框架核心与第三方插件全覆盖。
+17. **Extreme Runtime Lightweight, Minimal Memory Footprint**
+After container initialization, temporary objects such as BeanDefinition, parsers, and builders are automatically destroyed.
+At runtime, only **environment configuration + singleton Bean instance repository** are retained, achieving extreme memory optimization.
 
-10. **Bean 通用扩展点，用户自主自定义扩展**
-
-仅提供 **BeanPostProcessor** 基础扩展点，框架不内置任何增强逻辑；
-AOP、动态代理、事务、日志拦截等能力，均由用户基于此扩展点自主实现，完全开放、无固化逻辑。
-
-11. **环境配置加载扩展：EnvironmentLoader**
-
-提供标准 EnvironmentLoader 扩展点，支持从本地、远程配置中心加载环境配置，原生适配云原生配置体系。
-
-12. **配置后置处理扩展：EnvironmentPostProcessor**
-
-配置加载完成后，支持加密、脱敏、属性替换、合并等自定义增强处理，扩展性极强。
-
-13. **全扩展点统一规范：无参构造实例化**
-
-框架所有扩展接口统一使用**无参构造器**创建，实例化过程可控、简洁、无依赖注入侵入，稳定性极强。
-
-14. **配置自动绑定，类型安全映射**
-
-内置配置自动绑定、安全类型转换能力，支持多环境、标准化配置管理，满足企业级生产使用。
-
-15. **JDK 原生 SPI，插件化自动装配**
-
-基于 JDK 原生 SPI 机制实现插件发现、条件装载、自动装配，无第三方依赖，稳定、通用、轻量化。
-
-16. **优雅停机，无冗余销毁排序**
-
-原生支持优雅停机，不设计复杂无意义的 Bean 销毁顺序，各对象自主管理资源释放，极简实用、无过度设计。
-
-17. **运行时极致轻量化，内存占用最小化**
-
-容器初始化完成后，自动销毁 BeanDefinition、解析器、构建工具等临时对象；
-运行时仅保留**环境配置 + 单例 Bean 实例仓库**，内存极致优化。
-
-18. **严格职责边界，内核高度纯粹**
-
-IOC 内核只负责 Bean 管理、构造注入、实例创建；事务、事件、监控等能力均通过外部扩展实现，绝不耦合内核，架构长期可维护、可演进。
+18. **Strict Responsibility Boundaries, Highly Pure Kernel**
+The IOC kernel is only responsible for Bean management, constructor injection, and instance creation. Capabilities such as transactions, events, and monitoring are implemented through external extensions, never coupled with the kernel, ensuring long-term maintainability and evolvability of the architecture.
 
 ---
 
-# 官方推荐基础配置（云原生高并发最佳实践）
+# Official Recommended Basic Configuration (Best Practice for Cloud-Native High Concurrency)
+Designed for the cloud-native high-concurrency era, Pure IOC officially recommends a minimum runtime environment of **JDK 21 or above**, deeply embracing modern JVM features.
 
-Pure IOC 面向云原生高并发时代设计，官方最低推荐运行环境为 JDK 21 及以上版本，深度拥抱现代 JVM 特性。
+### Core Runtime Environment Recommendations
+- JDK Version: **JDK 21+** (based on virtual threads, ZGC, and other modern features)
+- Garbage Collector: **ZGC** (low pause, high throughput, maximizing cloud-native concurrency)
+- Concurrency Model: **Virtual Threads** (lightweight concurrency, easily supporting millions of threads)
 
-### 核心运行环境推荐
-
-- JDK 版本：**JDK 21+**（虚拟线程、ZGC 等现代化特性为基础）
-- 垃圾回收器：**ZGC**（低停顿、高吞吐，最大化发挥云原生并发能力）
-- 并发模型：**虚拟线程（Virtual Thread）**（轻量级并发，轻松支撑百万级线程）
-
-### 内存配置最佳实践
-
-结合 Pure IOC 极致轻量化的设计特性，官方强烈推荐使用小堆内存配置，而非传统大堆模式：
-- 推荐堆内存：**2GB ~ 4GB** 已完全足够支撑高并发、大规模业务场景。
-- 设计理念：小堆配合 ZGC 低延迟回收与虚拟线程高并发特性，可在极低成本下实现百万级并发处理能力，同时显著降低 K8s 资源调度压力与运行时开销。
-
+### Best Practices for Memory Configuration
+Combined with Pure IOC's extremely lightweight design, the official strongly recommends small heap memory configurations instead of traditional large heap mode:
+- Recommended heap memory: **2GB ~ 4GB** is fully sufficient to support high-concurrency, large-scale business scenarios.
+- Design Philosophy: Small heaps combined with ZGC low-latency collection and virtual thread high-concurrency features enable millions of concurrent processing at extremely low cost, while significantly reducing Kubernetes resource scheduling pressure and runtime overhead.
