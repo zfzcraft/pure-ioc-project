@@ -7,20 +7,42 @@
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 	<properties>
-	<revision>1.1.0</revision>
-	<java.version>21</java.version>
-	<maven.compiler.source>${java.version}</maven.compiler.source>
-	<maven.compiler.target>${java.version}</maven.compiler.target>
-	<maven.compiler.release>${java.version}</maven.compiler.release>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<revision>1.1.0</revision>
+		<java.version>21</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
 		<module>pure-ioc</module>
-		<module>purejar-maven-plugin</module>
 		<module>pure-ioc-hikaricp-plugin</module>
 		<module>pure-ioc-mybatisplus-plugin</module>
 		<module>pure-ioc-netty-http-plugin</module>
 		<module>pure-boot</module>
 		<module>pure-ioc-tx</module>
+		<module>generate-index-maven-plugin</module>
 	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<attach>true</attach> <!-- 自动附加到install/deploy -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -1,6 +1,9 @@
 package cn.zfzcraft.pureioc.utils;
 
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.zfzcraft.pureioc.core.IocException;
 import net.bytebuddy.jar.asm.AnnotationVisitor;
@@ -14,18 +17,24 @@ public class AnnotationUtils {
 	 * 判断字节码数组里是否含有指定注解
 	 * 
 	 * @param inputStream     类字节码
-	 * @param annotationClass 要判断的注解（如 Component.class, ConditionalOnClass.class）
+	 * @param beanAnnotationClasses 要判断的注解（如 Component.class, ConditionalOnClass.class）
 	 * @return 是否存在
 	 */
-	public static boolean hasAnnotation(InputStream inputStream, Class<?> annotationClass) {
-		String annotationDesc = "L" + annotationClass.getName().replace('.', '/') + ";";
+	public static boolean hasAnnotation(InputStream inputStream, List<Class<? extends Annotation>> beanAnnotationClasses) {
+		List<String> annotationsList = new ArrayList<>();
+		for (Class<? extends Annotation> beanAnnotationClass : beanAnnotationClasses) {
+			String annotationDesc = "L" + beanAnnotationClass.getName().replace('.', '/') + ";";
+			annotationsList.add(annotationDesc);
+		}
+		
+		
 		final boolean[] found = { false };
 		try {
 			ClassReader cr = new ClassReader(inputStream);
 			cr.accept(new ClassVisitor(Opcodes.ASM9) {
 				@Override
 				public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-					if (annotationDesc.equals(desc)) {
+					if (annotationsList.contains(desc)) {
 						found[0] = true;
 					}
 					return super.visitAnnotation(desc, visible);

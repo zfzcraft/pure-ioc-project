@@ -39,3 +39,6 @@ pure-ioc/.classpath
 /pure-ioc-netty-http-plugin/.settings
 /pure-ioc-netty-http-plugin/target
 /pure-ioc/target
+/generate-index-maven-plugin/.settings
+/generate-index-maven-plugin/target
+pure-boot/.factorypath

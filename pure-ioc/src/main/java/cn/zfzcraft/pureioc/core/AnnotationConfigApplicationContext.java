@@ -113,11 +113,9 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 
 	// CPU核心数
 	private static final int CPU = Runtime.getRuntime().availableProcessors();
-	// 线程数量 = CPU * 2
-	private static final int THREAD = CPU * 2;
 
 	// 自定义线程池
-	private static ThreadPoolExecutor ThreadPool = new ThreadPoolExecutor(THREAD, THREAD, 0L, TimeUnit.MILLISECONDS,
+	private static ThreadPoolExecutor ThreadPool = new ThreadPoolExecutor(0, CPU, 0L, TimeUnit.MILLISECONDS,
 			new LinkedBlockingQueue<>(256), new ThreadPoolExecutor.CallerRunsPolicy());
 
 	private Environment environment = new LocalEnvironment(env);
@@ -292,20 +290,20 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 	}
 
 	private void asyncInstantiateLazyBeansAndClearResources() {
-		 Thread thread = new Thread(() -> {
-		for (Entry<Class<?>, BeanDefinition> entry : beanDefinitionMap.entrySet()) {
-			Class<?> key = entry.getKey();
-			BeanDefinition value = entry.getValue();
-			if (!value.isEager()) {
-				getBean(key);
+		Thread thread = new Thread(() -> {
+			for (Entry<Class<?>, BeanDefinition> entry : beanDefinitionMap.entrySet()) {
+				Class<?> key = entry.getKey();
+				BeanDefinition value = entry.getValue();
+				if (!value.isEager()) {
+					getBean(key);
+				}
 			}
-		}
-		System.out.println("异步预热成功............");
-		preheatComplete.compareAndSet(false, true);
-		cleanResource();
-		System.out.println("清理资源成功............");
-		 });
-		 thread.start();
+			System.out.println("异步预热成功............");
+			preheatComplete.compareAndSet(false, true);
+			cleanResource();
+			System.out.println("清理资源成功............");
+		});
+		thread.start();
 	}
 
 	private void collectFactoryBeanMatchers() {
@@ -554,7 +552,7 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 
 	private void parallelLoadClasses(List<String> classNameList) {
 		// 1. 按照线程数分片
-		List<List<String>> splitList = splitList(classNameList, THREAD);
+		List<List<String>> splitList = splitList(classNameList, CPU);
 		// 2. 每一片提交异步任务，批量加载，返回当前片的List<Class<?>>
 		List<CompletableFuture<List<Class<?>>>> futures = new ArrayList<>();
 		for (List<String> batch : splitList) {
@@ -595,10 +593,13 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 	private void loadApplicationClasses(List<String> classNameList) {
 		for (String className : classNameList) {
 			try (InputStream inputStream = getClassInputStream(className)) {
-				if (isAnnotationClass(inputStream)) { // 替代isAnnotationClass
-					Class<?> clazz = Class.forName(className, false, ResourceLoader.getClassLoader());
-					applicationClasses.add(clazz);
+				if (inputStream!=null) {
+					if (isAnnotationClass(inputStream)) {
+						Class<?> clazz = Class.forName(className, false, ResourceLoader.getClassLoader());
+						applicationClasses.add(clazz);
+					}
 				}
+				
 			} catch (Exception e) {
 				throw IocException.of(e);
 			}
@@ -607,24 +608,16 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 	}
 
 	private InputStream getClassInputStream(String className) throws Exception {
-
 		// 2. 转成类路径格式
 		String classPath = className.replace('.', '/') + DOT_CLASS;
-
 		// 4. 打开流
-		try (InputStream inputStream = ResourceLoader.getResourceAsStream(classPath)) {
-			// 关键：找不到直接抛异常，不返回null
-			if (inputStream == null) {
-				throw new ClassNotFoundException("未找到类文件：" + className);
-			}
-
-			return inputStream;
-		}
+		InputStream inputStream = ResourceLoader.getResourceAsStream(classPath);
+		return inputStream;
 	}
 
 	private void parallelLoadApplicationClasses(List<String> classNameList) {
 		// 1. 按照线程数分片
-		List<List<String>> splitList = splitList(classNameList, THREAD);
+		List<List<String>> splitList = splitList(classNameList, CPU);
 		// 2. 每一片提交异步任务，批量加载，返回当前片的List<Class<?>>
 		List<CompletableFuture<List<Class<?>>>> futures = new ArrayList<>();
 		for (List<String> batch : splitList) {
@@ -706,7 +699,7 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 	}
 
 	private List<String> scanPackageclassNames() {
-		List<String> classNameList = scanPackageclassNames();
+		List<String> classNameList = new ArrayList<>();
 		String pkg = maincClass.getPackageName();
 		String path = pkg.replace(POINT, '/');
 		try {
@@ -805,11 +798,11 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 	}
 
 	private boolean isAnnotationClass(InputStream inputStream) {
-		for (Class<? extends Annotation> anno : beanAnnotationClasses) {
-			if (AnnotationUtils.hasAnnotation(inputStream, anno)) {
+		
+			if (AnnotationUtils.hasAnnotation(inputStream, beanAnnotationClasses)) {
 				return true;
 			}
-		}
+		
 		return false;
 	}
 
@@ -1005,7 +998,7 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 			}
 			for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
 				if (beanPostProcessor.matche(clazz)) {
-					instance = beanPostProcessor.postProcess(this, instance);
+					instance = beanPostProcessor.postProcess(this, clazz, instance);
 				}
 			}
 			ProxyContext.bind(clazz, instance);

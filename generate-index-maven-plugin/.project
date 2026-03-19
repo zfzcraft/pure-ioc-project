@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>purejar-maven-plugin</name>
+	<name>generate-index-maven-plugin</name>
 	<comment></comment>
 	<projects>
 	</projects>

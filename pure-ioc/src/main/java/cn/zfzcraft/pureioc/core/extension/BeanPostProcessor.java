@@ -11,7 +11,7 @@ public interface BeanPostProcessor extends ExtensionPoint {
 	boolean matche(Class<?> beanClass);
 	
 
-	Object postProcess(ApplicationContext applicationContext, Object bean);
+	Object postProcess(ApplicationContext applicationContext,Class<?> beanName, Object bean);
 
 	/**
 	 * Smaller order executes earlier; larger order executes later.
