@@ -5,7 +5,7 @@
     <artifactId>pure-ioc-project</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>generate-index-maven-plugin</artifactId>
+  <artifactId>pure-index-maven-plugin</artifactId>
 <packaging>maven-plugin</packaging>
 	<properties>
 		<java.version>21</java.version>

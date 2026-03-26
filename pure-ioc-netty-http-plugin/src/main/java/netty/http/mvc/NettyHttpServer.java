@@ -2,8 +2,6 @@ package netty.http.mvc;
 
 import java.util.concurrent.locks.LockSupport;
 
-import cn.zfzcraft.pureioc.annotations.Component;
-import cn.zfzcraft.pureioc.annotations.Eager;
 import cn.zfzcraft.pureioc.core.ApplicationContext;
 import cn.zfzcraft.pureioc.core.DisposableBean;
 import io.netty.bootstrap.ServerBootstrap;
@@ -16,11 +14,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-
 @SuppressWarnings("deprecation")
-@Component
-@Eager
 public class NettyHttpServer implements DisposableBean{
+	
 	
 	EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 	EventLoopGroup workerGroup = new NioEventLoopGroup();

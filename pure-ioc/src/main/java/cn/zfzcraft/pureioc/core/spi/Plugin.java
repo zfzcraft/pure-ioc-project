@@ -1,7 +1,7 @@
 package cn.zfzcraft.pureioc.core.spi;
 import java.util.Set;
 
-import cn.zfzcraft.pureioc.core.ExtensionPoint;
+import cn.zfzcraft.pureioc.core.extension.ExtensionPoint;
 
 /**
  * must be no args constructor

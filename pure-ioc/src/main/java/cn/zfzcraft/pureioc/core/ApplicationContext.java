@@ -1,19 +1,17 @@
 package cn.zfzcraft.pureioc.core;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Set;
-
-import cn.zfzcraft.pureioc.core.compoments.FrameworkCompoment;
 
 
-public interface ApplicationContext extends FrameworkCompoment{
+public interface ApplicationContext{
 
 	Environment getEnvironment();
 	
 	<T> T getBean(Class<T> clazz);
 
-	<T> List<T> getBeansOfType(Class<T> interfaceClass);
-	
-	Set<Class<?>> getBeanClasses();
+	List<Class<?>> getAnnotatedClasses(Class<? extends Annotation> annotationClass);
+
+	List<Class<?>> getImplementationClasses(Class<?> interfaceClass);
 
 }

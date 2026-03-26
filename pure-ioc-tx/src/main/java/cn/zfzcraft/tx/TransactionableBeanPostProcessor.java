@@ -21,7 +21,7 @@ public class TransactionableBeanPostProcessor implements BeanPostProcessor{
 	}
 
 	@Override
-	public Object postProcess(ApplicationContext applicationContext, Class<?> beanName, Object bean) {
+	public Object process(ApplicationContext applicationContext, Class<?> beanName, Object bean) {
 		DataSource dataSource = applicationContext.getBean(DataSource.class);
 		Transactionable transactionable =	bean.getClass().getAnnotation(Transactionable.class);
 		Class<?> proxyInterfaceClass = transactionable.proxyInterfaceClass();

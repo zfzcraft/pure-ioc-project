@@ -23,7 +23,7 @@ public class TransactionDataSourceBeanPostProcessor implements BeanPostProcessor
 
 
 	@Override
-	public Object postProcess(ApplicationContext applicationContext, Class<?> beanName, Object bean) {
+	public Object process(ApplicationContext applicationContext, Class<?> beanName, Object bean) {
 		DataSource dataSource = (DataSource) bean;
 		TransactionDataSource transactionDataSource = new TransactionDataSource(dataSource);
 		return transactionDataSource;

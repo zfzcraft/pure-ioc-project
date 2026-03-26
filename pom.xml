@@ -7,7 +7,7 @@
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 	<properties>
-		<revision>1.1.0</revision>
+		<revision>1.2.0</revision>
 		<java.version>21</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
@@ -21,7 +21,7 @@
 		<module>pure-ioc-netty-http-plugin</module>
 		<module>pure-boot</module>
 		<module>pure-ioc-tx</module>
-		<module>generate-index-maven-plugin</module>
+		<module>pure-index-maven-plugin</module>
 	</modules>
 
 	<build>

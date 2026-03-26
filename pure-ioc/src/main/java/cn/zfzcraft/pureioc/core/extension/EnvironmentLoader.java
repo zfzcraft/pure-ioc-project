@@ -3,7 +3,6 @@ package cn.zfzcraft.pureioc.core.extension;
 import java.util.Map;
 
 import cn.zfzcraft.pureioc.core.Environment;
-import cn.zfzcraft.pureioc.core.ExtensionPoint;
 /**
  * must be no args constructor
  */

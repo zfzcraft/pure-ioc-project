@@ -4,30 +4,23 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import cn.zfzcraft.pureioc.core.IocException;
-import net.bytebuddy.jar.asm.AnnotationVisitor;
-import net.bytebuddy.jar.asm.ClassReader;
-import net.bytebuddy.jar.asm.ClassVisitor;
-import net.bytebuddy.jar.asm.Opcodes;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
+
+import cn.zfzcraft.pureioc.core.exception.IgnoreException;
 
 public class AnnotationUtils {
 
-	/**
-	 * 判断字节码数组里是否含有指定注解
-	 * 
-	 * @param inputStream     类字节码
-	 * @param beanAnnotationClasses 要判断的注解（如 Component.class, ConditionalOnClass.class）
-	 * @return 是否存在
-	 */
-	public static boolean hasAnnotation(InputStream inputStream, List<Class<? extends Annotation>> beanAnnotationClasses) {
+	public static boolean hasAnnotation(InputStream inputStream, Set<Class<? extends Annotation>> set) {
 		List<String> annotationsList = new ArrayList<>();
-		for (Class<? extends Annotation> beanAnnotationClass : beanAnnotationClasses) {
+		for (Class<? extends Annotation> beanAnnotationClass : set) {
 			String annotationDesc = "L" + beanAnnotationClass.getName().replace('.', '/') + ";";
 			annotationsList.add(annotationDesc);
-		}
-		
-		
+		}	
 		final boolean[] found = { false };
 		try {
 			ClassReader cr = new ClassReader(inputStream);
@@ -43,8 +36,7 @@ public class AnnotationUtils {
 
 			return found[0];
 		} catch (Exception e) {
-			throw IocException.of(e);
+			throw new IgnoreException("ignore", e);
 		}
-
 	}
 }

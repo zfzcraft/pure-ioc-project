@@ -6,6 +6,8 @@ import cn.zfzcraft.pureioc.annotations.ConfigurationProperties;
 public class EnvironmentProperties {
 
 	private String active;
+	
+	private boolean preheat = false;
 
 	public String getActive() {
 		return active;
@@ -13,6 +15,14 @@ public class EnvironmentProperties {
 
 	public void setActive(String active) {
 		this.active = active;
+	}
+
+	public boolean isPreheat() {
+		return preheat;
+	}
+
+	public void setPreheat(boolean preheat) {
+		this.preheat = preheat;
 	}
 
 	

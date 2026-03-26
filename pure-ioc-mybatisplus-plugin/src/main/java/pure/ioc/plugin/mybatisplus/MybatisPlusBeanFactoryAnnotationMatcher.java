@@ -17,7 +17,7 @@ public class MybatisPlusBeanFactoryAnnotationMatcher implements BeanFactoryAnnot
 	}
 
 	@Override
-	public Class<? extends BeanFactory> getBeanFactoryClass() {
-		return MapperBeanFactory.class;
+	public BeanFactory getBeanFactory() {
+		return new MapperBeanFactory();
 	}
 }

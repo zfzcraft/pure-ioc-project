@@ -22,23 +22,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-/.settings
-/pure-boot/target
-/pure-boot/.settings
-/purejar-maven-plugin/target
-/purejar-maven-plugin/.settings
-pure-ioc/.classpath
-/pure-ioc/.settings
-/pure-ioc-tx/target
-/pure-ioc-tx/.settings
 .classpath
-/pure-ioc-hikaricp-plugin/.settings
-/pure-ioc-hikaricp-plugin/target
-/pure-ioc-mybatisplus-plugin/.settings
-/pure-ioc-mybatisplus-plugin/target
-/pure-ioc-netty-http-plugin/.settings
-/pure-ioc-netty-http-plugin/target
-/pure-ioc/target
-/generate-index-maven-plugin/.settings
-/generate-index-maven-plugin/target
-pure-boot/.factorypath
+**/.settings
+**/target
+**/.factorypath

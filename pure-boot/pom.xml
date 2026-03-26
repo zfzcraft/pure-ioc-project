@@ -85,13 +85,17 @@
 				<groupId>cn.zfzcraft</groupId>
 
 
-				<artifactId>generate-index-maven-plugin</artifactId>
+				<artifactId>pure-index-maven-plugin</artifactId>
 				<version>${revision}</version>
 				<executions>
 					<execution>
+						<!-- 执行ID，自定义即可 -->
+						<id>generate-index</id>
+						<!-- 核心：绑定到process-classes阶段（编译后执行） -->
 						<phase>process-classes</phase>
 						<goals>
-							<goal>run</goal>
+							<!-- 你的插件目标名，对应GenerateIndexMojo的@Mojo注解name -->
+							<goal>generate-index</goal>
 						</goals>
 					</execution>
 				</executions>

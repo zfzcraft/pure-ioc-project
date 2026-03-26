@@ -14,13 +14,14 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import io.netty.channel.ChannelHandler.Sharable;;
+
 @Sharable
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
 	private static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json; charset=UTF-8";
-	
+
 	private ApplicationContext applicationContext;
-	
+
 	private final Map<String, Handler> handlerMap = new ConcurrentHashMap<>();
 
 	public HttpServerHandler(ApplicationContext applicationContext) {
@@ -30,24 +31,23 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 	}
 
 	private void init() {
-		for (Class<?> clazz : applicationContext.getBeanClasses()) {
-			if (clazz.isAnnotationPresent(RestController.class)) {
-				RequestMapping requestMapping = clazz.getAnnotation(RequestMapping.class);
-				String classUrl = "";
-				if (requestMapping!=null) {
-					classUrl = requestMapping.value();
-				}
-				// 遍历所有方法，找@MiniGetMapping注解
-				for (Method method : clazz.getDeclaredMethods()) {
-					if (method.isAnnotationPresent(GetMapping.class)) {
-						GetMapping mapping = method.getAnnotation(GetMapping.class);
-						String methodUrl = mapping.value();
-						String url = classUrl+methodUrl;
-						// 存入路由表：URL -> 处理器（对象+方法）
-						handlerMap.put(url, new Handler(clazz, method));
-					}
+		for (Class<?> clazz : applicationContext.getAnnotatedClasses(RestController.class)) {
+			RequestMapping requestMapping = clazz.getAnnotation(RequestMapping.class);
+			String classUrl = "";
+			if (requestMapping != null) {
+				classUrl = requestMapping.value();
+			}
+			// 遍历所有方法，找@MiniGetMapping注解
+			for (Method method : clazz.getDeclaredMethods()) {
+				if (method.isAnnotationPresent(GetMapping.class)) {
+					GetMapping mapping = method.getAnnotation(GetMapping.class);
+					String methodUrl = mapping.value();
+					String url = classUrl + methodUrl;
+					// 存入路由表：URL -> 处理器（对象+方法）
+					handlerMap.put(url, new Handler(clazz, method));
 				}
 			}
+
 		}
 	}
 
@@ -59,7 +59,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 		String uri = request.uri();
 		if (uri.endsWith("ico")) {
 			ctx.writeAndFlush("");
-		}else {
+		} else {
 			String path = uri.split("\\?")[0];
 			Handler handler = handlerMap.get(path);
 			Object controller = getController(handler);
@@ -70,14 +70,13 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 					Unpooled.copiedBuffer(content, CharsetUtil.UTF_8));
 
 			// 设置头
-			response.headers()
-	        .set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF_8)
-	        .set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+			response.headers().set(HttpHeaderNames.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF_8)
+					.set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
 
 			// 3. 写出并关闭
 			ctx.writeAndFlush(response);
 		}
-		
+
 	}
 
 	private Object getController(Handler handler) {

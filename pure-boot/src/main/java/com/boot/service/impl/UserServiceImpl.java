@@ -4,8 +4,8 @@ import com.boot.entity.User;
 import com.boot.mapper.UserMapper;
 import com.boot.service.UserService;
 
-import cn.zfzcraft.pureioc.annotations.Component;
-@Component
+import cn.zfzcraft.pureioc.annotations.Compoment;
+@Compoment
 public class UserServiceImpl implements UserService{
 
 	UserMapper userMapper;
