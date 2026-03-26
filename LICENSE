@@ -6,8 +6,8 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 1.  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 2.  Any modified version, derived work, or optimized version based on the Software shall prominently display the original credit in the README, official website, documentation, and release notes:
-    *"This work is based on the original Sloth IOC framework created by [你的名字]."*
-3.  You shall not claim the original architecture, core design, lazy-loading mechanism, indexing structure, or overall IOC design ideas of Sloth IOC as your own original creation.
+    *"This work is based on the original Pure IOC framework created by [zfzcraft]."*
+3.  You shall not claim the original architecture, core design, lazy-loading mechanism, indexing structure, or overall IOC design ideas of Pure IOC as your own original creation.
 4.  You shall not rebrand, rename, or repackage the Software as a new independent IOC container without prior written permission from the copyright holder.
 5.  The original authorship, core design rights, and intellectual property rights of the Software are permanently retained by the copyright holder. If you wish to obtain full ownership and copyright of the original work, please contact the author for negotiation.
 
@@ -23,8 +23,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 1.  上述版权声明及本许可声明必须包含在本软件的所有副本或实质性部分中。
 2.  任何基于本软件的修改版本、衍生作品或优化版本，必须在 README、官方网站、文档及发行说明中以显著方式标注：
-    *“本作品基于原 Sloth IOC 框架开发，作者为 [zfzcraft]。”*
-3.  您不得宣称 Sloth IOC 原创的架构、核心设计、懒加载机制、索引结构及整体 IOC 设计思想为您自身的原创成果。
+    *“本作品基于原 Pure IOC 框架开发，作者为 [zfzcraft]。”*
+3.  您不得宣称 Pure IOC 原创的架构、核心设计、懒加载机制、索引结构及整体 IOC 设计思想为您自身的原创成果。
 4.  未经版权持有者书面事先许可，您不得对本软件更名、换皮、重新打包，并将其作为全新独立的 IOC 容器发布。
 5.  本软件的原创署名权、核心设计权与知识产权由版权持有者永久保留。如您希望获得本作品的完整所有权与版权，请联系作者进行洽谈。
 
