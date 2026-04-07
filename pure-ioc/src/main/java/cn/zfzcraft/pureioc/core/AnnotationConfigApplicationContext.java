@@ -103,6 +103,8 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 			registerBeanDefinitions();
 
 			registerApplicationContext();
+			
+			initializeProxyContext();
 
 			instantiateEagerBeans();
 
@@ -112,6 +114,11 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 
 			registerShutdownHook();
 		}
+	}
+
+	private void initializeProxyContext() {
+		ProxyContext.initializeApplicationContext(this);
+		
 	}
 
 	private void instantiateEagerBeans() {
@@ -401,7 +408,6 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 				beanObject = beanPostProcessor.process(this, clazz, beanObject);
 			}
 		}
-		ProxyContext.bind(clazz, beanObject);
 		return beanObject;
 	}
 

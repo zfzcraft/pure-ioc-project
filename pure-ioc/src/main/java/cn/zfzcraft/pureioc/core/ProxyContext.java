@@ -1,49 +1,77 @@
 package cn.zfzcraft.pureioc.core;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import cn.zfzcraft.pureioc.annotations.TargetInterface;
+import cn.zfzcraft.pureioc.core.exception.LazyProxyBeanCreationFailedException;
+import cn.zfzcraft.pureioc.utils.ClassInterfaceUtils;
+import cn.zfzcraft.pureioc.utils.ProxyReflectUtils;
 
 //动态代理上下文
 public final class ProxyContext {
 
-	protected static final Map<Class<?>, Object> PROXY_MAP = new ConcurrentHashMap<>();
+	private static ApplicationContext cachedApplicationContext;
 
-    private ProxyContext() {
-        throw new AssertionError();
-    }
+	private static final Map<Class<?>, Object> PROXY_MAP = new ConcurrentHashMap<>();
 
-    // 容器内部：注册【最外层代理】
-    public static void bind(Class<?> beanType, Object proxy) {
-        if (beanType == null || proxy == null) {
-            return;
-        }
-        PROXY_MAP.put(beanType, proxy);
-    }
+	private ProxyContext() {
+	}
 
-    // 外部获取：自动按继承 / 接口匹配（isAssignableFrom）
-    @SuppressWarnings("unchecked")
-    public static <T> T get(Class<T> type) {
-        if (type == null) {
-            return null;
-        }
+	@SuppressWarnings("unchecked")
+	public static <T> T get(Class<T> type) {
+		if (type == null) {
+			return null;
+		}
+		T proxy = (T) PROXY_MAP.computeIfAbsent(type, function -> {
+			return createLazyProxy(type);
+		});
+		return proxy;
+	}
 
-        // 1. 先精确匹配（最快）
-        T proxy = (T) PROXY_MAP.get(type);
-        if (proxy != null) {
-            return proxy;
-        }
+	private static <T> Object createLazyProxy(Class<T> type) {
+		if (type.isInterface()) {
+			return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type },
+					new LazyInvocationHandler(type));
+		} else if (ClassInterfaceUtils.hasOnlyOneBusinessInterface(type)) {
+			Class<?> interfaceClass = ClassInterfaceUtils.getAllBusinessInterfaces(type).iterator().next();
+			return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { interfaceClass },
+					new LazyInvocationHandler(type));
+		} else if (type.isAnnotationPresent(TargetInterface.class)) {
+			TargetInterface targetInterface = type.getAnnotation(TargetInterface.class);
+			return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { targetInterface.value() },
+					new LazyInvocationHandler(type));
+		} else {
+			throw new LazyProxyBeanCreationFailedException("Lazy Proxy Bean :" + type
+					+ "CreationFailed on : must be interface or only one interface or annotated with @TargetInterface！");
+		}
+	}
 
-        // 2. 没有精确匹配，遍历找最匹配的类型
-        for (Map.Entry<Class<?>, Object> entry : PROXY_MAP.entrySet()) {
-            Class<?> beanType = entry.getKey();
-            if (type.isAssignableFrom(beanType)) {
-                return (T) entry.getValue();
-            }
-        }
-        return null;
-    }
+	static class LazyInvocationHandler implements InvocationHandler {
+		private Class<?> type;
+		public LazyInvocationHandler(Class<?> type) {
+			super();
+			this.type = type;
+		}
 
-    protected static void clear() {
-        PROXY_MAP.clear();
-    }
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			Object beanObject = cachedApplicationContext.getBean(type);
+			return ProxyReflectUtils.invokeMethod(method, beanObject, args);
+		}
+
+	}
+
+	protected static void clear() {
+		PROXY_MAP.clear();
+	}
+
+	protected static void initializeApplicationContext(AnnotationConfigApplicationContext applicationContext) {
+		if (cachedApplicationContext == null) {
+			cachedApplicationContext = applicationContext;
+		}
+	}
 }

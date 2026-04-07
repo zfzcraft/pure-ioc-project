@@ -3,7 +3,10 @@ package cn.zfzcraft.pureioc.core.index;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
+
 
 
 //-------------------------------------------------------------------------
@@ -16,7 +19,7 @@ public class MetaClassVisitor extends ClassVisitor {
 	private final List<String> annotations = new ArrayList<>();
 
 	public MetaClassVisitor() {
-		super(org.objectweb.asm.Opcodes.ASM9);
+		super(Opcodes.ASM9);
 	}
 
 	@Override
@@ -25,7 +28,7 @@ public class MetaClassVisitor extends ClassVisitor {
 	}
 
 	@Override
-	public org.objectweb.asm.AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+	public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
 		String anno = desc.substring(1, desc.length() - 1).replace('/', '.');
 		annotations.add(anno);
 		return super.visitAnnotation(desc, visible);

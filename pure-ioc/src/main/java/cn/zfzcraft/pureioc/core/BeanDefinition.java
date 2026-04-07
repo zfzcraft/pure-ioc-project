@@ -1,8 +1,6 @@
 package cn.zfzcraft.pureioc.core;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-
 import cn.zfzcraft.pureioc.core.extension.BeanFactory;
 
 public class BeanDefinition {

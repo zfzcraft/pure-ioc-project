@@ -13,6 +13,7 @@ import org.objectweb.asm.Opcodes;
 
 import cn.zfzcraft.pureioc.core.exception.IgnoreException;
 
+
 public class AnnotationUtils {
 
 	public static boolean hasAnnotation(InputStream inputStream, Set<Class<? extends Annotation>> set) {
