@@ -8,6 +8,5 @@ public class BootstrapApplication {
 			context.setMaincClass(mainClass);
 			context.refresh();
 			return context;
-		
 	}
 }

@@ -51,7 +51,9 @@ public final class ProxyContext {
 	}
 
 	static class LazyInvocationHandler implements InvocationHandler {
+		
 		private Class<?> type;
+		
 		public LazyInvocationHandler(Class<?> type) {
 			super();
 			this.type = type;

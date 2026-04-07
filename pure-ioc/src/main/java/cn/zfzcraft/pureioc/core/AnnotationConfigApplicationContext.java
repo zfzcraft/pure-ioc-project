@@ -23,6 +23,7 @@ import cn.zfzcraft.pureioc.core.exception.BeanFactoryNotFoundException;
 import cn.zfzcraft.pureioc.core.exception.BeanNotExistException;
 import cn.zfzcraft.pureioc.core.exception.ExtensionCreationFailedException;
 import cn.zfzcraft.pureioc.core.exception.IgnoreException;
+import cn.zfzcraft.pureioc.core.exception.ResourcesNotFoundException;
 import cn.zfzcraft.pureioc.core.exception.TooManyBeanFactoriesException;
 import cn.zfzcraft.pureioc.core.extension.BeanFactory;
 import cn.zfzcraft.pureioc.core.extension.BeanFactoryAnnotationMatcher;
@@ -35,7 +36,6 @@ import cn.zfzcraft.pureioc.core.spi.Plugin;
 import cn.zfzcraft.pureioc.utils.ClassLoaderUtils;
 import cn.zfzcraft.pureioc.utils.NestedMapUtils;
 import cn.zfzcraft.pureioc.utils.ResourceUtils;
-import cn.zfzcraft.pureioc.utils.ResourcesNotFoundException;
 
 public final class AnnotationConfigApplicationContext implements LifeCycleApplicationContext {
 
@@ -118,7 +118,6 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 
 	private void initializeProxyContext() {
 		ProxyContext.initializeApplicationContext(this);
-		
 	}
 
 	private void instantiateEagerBeans() {
@@ -129,7 +128,6 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 				getBean(clazz);
 			}
 		}
-
 	}
 
 	// ==========================
@@ -164,7 +162,6 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 				preheatLazyBeans();
 				preheated.compareAndSet(false, true);
 				clearResources();
-
 			}).start();
 		}
 	}
@@ -177,32 +174,20 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 				getBean(clazz);
 			}
 		}
-
 	}
 
 	private void clearResources() {
 		pluginClasses.clear();
-
 		beanPostProcessors.clear();
-
 		beanDefinitionMap.clear();
-
 		applicationClassNameList.clear();
-
 		beanFactoryMap.clear();
-
 		applicationClasses.clear();
-		
 		pluginClasses = null;
-
 		beanPostProcessors = null;
-
 		beanDefinitionMap = null;
-
 		applicationClassNameList = null;
-
 		beanFactoryMap = null;
-
 		applicationClasses =null;
 	}
 
@@ -339,7 +324,6 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 				registerMethodBeanDefinition(clazz);
 			}
 		}
-
 	}
 
 	private void registerMethodBeanDefinition(Class<?> clazz) {
@@ -399,7 +383,6 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 			throw new BeanNotExistException("Bean " + clazz.getName() + " Not Exist ");
 		}
 		Object beanObject = beanDefinition.getBeanFactory().createBean(this, beanDefinition.getBeanElement());
-
 		if (beanObject == null) {
 			throw new BeanNotExistException("Bean " + clazz + " Not Exist!");
 		}

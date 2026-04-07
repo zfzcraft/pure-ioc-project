@@ -1,12 +1,19 @@
 package cn.zfzcraft.pureioc.utils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
+import cn.zfzcraft.pureioc.core.exception.ResourcesNotFoundException;
+
 
 public class ResourceUtils {
 	
+	public static InputStream load(String path) {
+		return ClassLoaderUtils.getClassLoader().getResourceAsStream(path);
+	}
+
 	public static boolean exists(String path) {
 		return getResource(path)!=null;
 	}

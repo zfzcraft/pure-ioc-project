@@ -7,6 +7,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import cn.zfzcraft.pureioc.utils.ClassLoaderUtils;
+
 
 public class ParallelClassLoader {
 
@@ -30,7 +32,7 @@ public class ParallelClassLoader {
 				for (String className : batch) {
 					try {
 						// 核心：加载类
-						Class<?> clazz = Class.forName(className, false, ResourceLoader.getClassLoader());
+						Class<?> clazz = Class.forName(className, false, ClassLoaderUtils.getClassLoader());
 						// 放进当前分片集合
 						partClassList.add(clazz);
 					} catch (Exception e) {
@@ -42,10 +44,8 @@ public class ParallelClassLoader {
 			}, ThreadPool);
 			futures.add(future);
 		}
-
 		// 3. 等待所有任务执行完
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[splitList.size()])).join();
-
 		// 4. 最终总集合，收集所有Class
 		for (CompletableFuture<List<Class<?>>> future : futures) {
 			try {
@@ -67,7 +67,6 @@ public class ParallelClassLoader {
 		List<List<String>> result = new ArrayList<>();
 		int total = source.size();
 		int step = (total + part - 1) / part;
-
 		for (int i = 0; i < part; i++) {
 			int start = i * step;
 			int end = Math.min(start + step, total);
