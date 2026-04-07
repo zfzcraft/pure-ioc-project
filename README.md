@@ -65,7 +65,7 @@ At runtime, only **environment configuration + singleton Bean instance repositor
 18. **Strict Responsibility Boundaries, Highly Pure Kernel**
 The IOC kernel is only responsible for Bean management, constructor injection, and instance creation. Capabilities such as transactions, events, and monitoring are implemented through external extensions, never coupled with the kernel, ensuring long-term maintainability and evolvability of the architecture.
 
-# 19. Unified Configuration File Format, Minimalist Specification
+19. Unified Configuration File Format, Minimalist Specification
 The framework only supports configuration files in **YML** format globally and is incompatible with other redundant configuration formats. Adhering to the minimalist design philosophy, it unifies standards, reduces complexity, and improves parsing efficiency.
 
 ---
