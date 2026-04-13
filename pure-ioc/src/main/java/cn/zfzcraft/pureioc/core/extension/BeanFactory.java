@@ -2,6 +2,7 @@ package cn.zfzcraft.pureioc.core.extension;
 
 import java.lang.reflect.AnnotatedElement;
 
+import cn.zfzcraft.pureioc.annotations.QualifierTargetClass;
 import cn.zfzcraft.pureioc.core.ApplicationContext;
 
 /**
@@ -14,7 +15,14 @@ public interface BeanFactory{
 	default Object[] resolveArgs(ApplicationContext applicationContext, Class<?>[] types) {
 		Object[] args = new Object[types.length];
 		for (int i = 0; i < types.length; i++) {
-			args[i] = applicationContext.getBean(types[i]);
+			Class<?> argClass = types[i];
+			if(argClass.isAnnotationPresent(QualifierTargetClass.class)) {
+				QualifierTargetClass qualifierTargetClass = argClass.getAnnotation(QualifierTargetClass.class);
+				Class<?> beanTargetClass = qualifierTargetClass.value();
+				args[i] = applicationContext.getBean(beanTargetClass);
+			}else {
+				args[i] = applicationContext.getBean(types[i]);
+			}
 		}
 		return args;
 	}

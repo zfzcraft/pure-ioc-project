@@ -22,7 +22,7 @@ public class ClassInterfaceUtils {
     /**
      * 判断类【递归所有层级、去重、排除JDK接口后】是否只有 1 个业务接口
      */
-    public static boolean hasOnlyOneBusinessInterface(Class<?> clazz) {
+    public static boolean hasOnlyOneInterface(Class<?> clazz) {
         Set<Class<?>> allInterfaces = new HashSet<>();
         collectAllInterfaces(clazz, allInterfaces);
 
@@ -52,7 +52,7 @@ public class ClassInterfaceUtils {
         collectAllInterfaces(clazz.getSuperclass(), result);
     }
 
-	public static <T>  Set<Class<?>> getAllBusinessInterfaces(Class<T> type) {
+	public static <T>  Set<Class<?>> getAllInterfaces(Class<T> type) {
 		Set<Class<?>> allInterfaces = new HashSet<>();
         collectAllInterfaces(type, allInterfaces);
 

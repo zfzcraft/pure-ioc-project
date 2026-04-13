@@ -81,7 +81,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!--<plugin>
 				<groupId>cn.zfzcraft</groupId>
 
 
@@ -89,17 +89,17 @@
 				<version>${revision}</version>
 				<executions>
 					<execution>
-						<!-- 执行ID，自定义即可 -->
+						 执行ID，自定义即可 
 						<id>generate-index</id>
-						<!-- 核心：绑定到process-classes阶段（编译后执行） -->
+						 核心：绑定到process-classes阶段（编译后执行） 
 						<phase>process-classes</phase>
 						<goals>
-							<!-- 你的插件目标名，对应GenerateIndexMojo的@Mojo注解name -->
+							 你的插件目标名，对应GenerateIndexMojo的@Mojo注解name 
 							<goal>generate-index</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
 </project>

@@ -6,7 +6,7 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import cn.zfzcraft.pureioc.annotations.TargetInterface;
+import cn.zfzcraft.pureioc.annotations.ProxyInterface;
 import cn.zfzcraft.pureioc.core.exception.LazyProxyBeanCreationFailedException;
 import cn.zfzcraft.pureioc.utils.ClassInterfaceUtils;
 import cn.zfzcraft.pureioc.utils.ProxyReflectUtils;
@@ -36,12 +36,12 @@ public final class ProxyContext {
 		if (type.isInterface()) {
 			return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type },
 					new LazyInvocationHandler(type));
-		} else if (ClassInterfaceUtils.hasOnlyOneBusinessInterface(type)) {
-			Class<?> interfaceClass = ClassInterfaceUtils.getAllBusinessInterfaces(type).iterator().next();
+		} else if (ClassInterfaceUtils.hasOnlyOneInterface(type)) {
+			Class<?> interfaceClass = ClassInterfaceUtils.getAllInterfaces(type).iterator().next();
 			return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { interfaceClass },
 					new LazyInvocationHandler(type));
-		} else if (type.isAnnotationPresent(TargetInterface.class)) {
-			TargetInterface targetInterface = type.getAnnotation(TargetInterface.class);
+		} else if (type.isAnnotationPresent(ProxyInterface.class)) {
+			ProxyInterface targetInterface = type.getAnnotation(ProxyInterface.class);
 			return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { targetInterface.value() },
 					new LazyInvocationHandler(type));
 		} else {

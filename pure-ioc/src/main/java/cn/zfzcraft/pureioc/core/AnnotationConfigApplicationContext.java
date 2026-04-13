@@ -21,6 +21,7 @@ import cn.zfzcraft.pureioc.annotations.Extension;
 import cn.zfzcraft.pureioc.annotations.Imports;
 import cn.zfzcraft.pureioc.core.exception.BeanFactoryNotFoundException;
 import cn.zfzcraft.pureioc.core.exception.BeanNotExistException;
+import cn.zfzcraft.pureioc.core.exception.ConstructorCircularDependencyError;
 import cn.zfzcraft.pureioc.core.exception.ExtensionCreationFailedException;
 import cn.zfzcraft.pureioc.core.exception.IgnoreException;
 import cn.zfzcraft.pureioc.core.exception.ResourcesNotFoundException;
@@ -70,6 +71,8 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 
 	private List<Class<?>> applicationClasses = new ArrayList<>();
 
+	private Set<Class<?>> creatingBeans = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
 	@Override
 	public void setMaincClass(Class<?> maincClass) {
 		this.maincClass = maincClass;
@@ -103,7 +106,7 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 			registerBeanDefinitions();
 
 			registerApplicationContext();
-			
+
 			initializeProxyContext();
 
 			instantiateEagerBeans();
@@ -123,8 +126,8 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 	private void instantiateEagerBeans() {
 		for (Entry<Class<?>, BeanDefinition> entry : beanDefinitionMap.entrySet()) {
 			Class<?> clazz = entry.getKey();
-			 BeanDefinition beanDefinition = entry.getValue();
-			 if (beanDefinition.isEager()) {
+			BeanDefinition beanDefinition = entry.getValue();
+			if (beanDefinition.isEager()) {
 				getBean(clazz);
 			}
 		}
@@ -143,7 +146,6 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 		applicationClasses.addAll(classes);
 	}
 
-	
 	private void registerBeanDefinitions() {
 		for (Class<?> clazz : applicationClasses) {
 			registerBeanDefinition(clazz);
@@ -152,7 +154,6 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 			registerBeanDefinition(clazz);
 		}
 	}
-
 
 	private void asyncPreheatBeansAndClearResources() {
 		String prefix = EnvironmentProperties.class.getAnnotation(ConfigurationProperties.class).prefix();
@@ -169,8 +170,8 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 	private void preheatLazyBeans() {
 		for (Entry<Class<?>, BeanDefinition> entry : beanDefinitionMap.entrySet()) {
 			Class<?> clazz = entry.getKey();
-			 BeanDefinition beanDefinition = entry.getValue();
-			 if (!beanDefinition.isEager()) {
+			BeanDefinition beanDefinition = entry.getValue();
+			if (!beanDefinition.isEager()) {
 				getBean(clazz);
 			}
 		}
@@ -183,12 +184,14 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 		applicationClassNameList.clear();
 		beanFactoryMap.clear();
 		applicationClasses.clear();
+		creatingBeans.clear();
 		pluginClasses = null;
 		beanPostProcessors = null;
 		beanDefinitionMap = null;
 		applicationClassNameList = null;
 		beanFactoryMap = null;
-		applicationClasses =null;
+		applicationClasses = null;
+		creatingBeans = null;
 	}
 
 	private void registerApplicationContext() {
@@ -319,7 +322,7 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 		if (isAnnotationClass(clazz)) {
 			boolean eager = getEager(clazz);
 			BeanFactory beanFactory = getBeanFactory(clazz.getAnnotations());
-			beanDefinitionMap.putIfAbsent(clazz, new BeanDefinition(clazz, eager,beanFactory));
+			beanDefinitionMap.putIfAbsent(clazz, new BeanDefinition(clazz, eager, beanFactory));
 			if (clazz.isAnnotationPresent(Configuration.class)) {
 				registerMethodBeanDefinition(clazz);
 			}
@@ -343,7 +346,7 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 			boolean eagerMethod = getEager(beanMethod);
 			Class<?> returnType = beanMethod.getReturnType();
 			BeanFactory beanFactory = getBeanFactory(beanMethod.getAnnotations());
-			beanDefinitionMap.putIfAbsent(returnType, new BeanDefinition(beanMethod, eagerMethod,beanFactory));
+			beanDefinitionMap.putIfAbsent(returnType, new BeanDefinition(beanMethod, eagerMethod, beanFactory));
 		}
 	}
 
@@ -368,8 +371,13 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 		if (bean != null) {
 			return (T) bean;
 		}
-		synchronized (singletonPool) {
+		synchronized (clazz) {
+			bean = singletonPool.get(clazz);
 			if (bean == null) {
+				if (creatingBeans.contains(clazz)) {
+					throw new ConstructorCircularDependencyError("Constructor Circular Dependency Error on Class :" + clazz);
+				}
+				creatingBeans.add(clazz);
 				bean = createBean(clazz);
 				singletonPool.put(clazz, bean);
 			}
