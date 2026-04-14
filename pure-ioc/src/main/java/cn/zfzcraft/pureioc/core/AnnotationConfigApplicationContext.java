@@ -26,6 +26,7 @@ import cn.zfzcraft.pureioc.core.exception.ExtensionCreationFailedException;
 import cn.zfzcraft.pureioc.core.exception.IgnoreException;
 import cn.zfzcraft.pureioc.core.exception.ResourcesNotFoundException;
 import cn.zfzcraft.pureioc.core.exception.TooManyBeanFactoriesException;
+import cn.zfzcraft.pureioc.core.exception.TooManyBeansException;
 import cn.zfzcraft.pureioc.core.extension.BeanFactory;
 import cn.zfzcraft.pureioc.core.extension.BeanFactoryAnnotationMatcher;
 import cn.zfzcraft.pureioc.core.extension.BeanPostProcessor;
@@ -386,11 +387,17 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 	}
 
 	private Object createBean(Class<?> clazz) {
-		BeanDefinition beanDefinition = beanDefinitionMap.get(clazz);
+		BeanDefinition beanDefinition;
+		if (clazz.isInterface()) {
+			beanDefinition = getInterfaceBeanDefinition(clazz);
+		}else {
+			beanDefinition = beanDefinitionMap.get(clazz);
+		}
 		if (beanDefinition == null) {
 			throw new BeanNotExistException("Bean " + clazz.getName() + " Not Exist ");
 		}
-		Object beanObject = beanDefinition.getBeanFactory().createBean(this, beanDefinition.getBeanElement());
+		BeanFactory beanFactory = beanDefinition.getBeanFactory();
+		Object beanObject = beanFactory.createBean(this, beanDefinition.getBeanElement());
 		if (beanObject == null) {
 			throw new BeanNotExistException("Bean " + clazz + " Not Exist!");
 		}
@@ -400,6 +407,23 @@ public final class AnnotationConfigApplicationContext implements LifeCycleApplic
 			}
 		}
 		return beanObject;
+	}
+
+	private BeanDefinition getInterfaceBeanDefinition(Class<?> clazz) {
+		List<BeanDefinition> beanDefinitions = new ArrayList<>();
+		for (Entry<Class<?>, BeanDefinition> entry : beanDefinitionMap.entrySet()) {
+			if (clazz.isAssignableFrom(entry.getKey())) {
+				beanDefinitions.add(entry.getValue());
+			}
+		}
+		if (beanDefinitions.isEmpty()) {
+			throw new BeanNotExistException("Bean " + clazz + " Not Exist!");
+		}
+		
+		if (beanDefinitions.size()>1) {
+			throw new TooManyBeansException("Too Many Beans on Interface Class:"+clazz);
+		}
+		return beanDefinitions.get(0);
 	}
 
 	private BeanFactory getBeanFactory(Annotation[] annotations) {

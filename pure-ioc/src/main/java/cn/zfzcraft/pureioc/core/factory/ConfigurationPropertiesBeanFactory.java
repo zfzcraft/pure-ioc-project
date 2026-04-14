@@ -23,9 +23,7 @@ public class ConfigurationPropertiesBeanFactory implements BeanFactory {
 		Object beanObject = environment.getProperty(prefix, beanClass);
 		try {
 			if (beanObject == null) {
-				beanObject = createIfNull(null, beanClass);
-			} else {
-				beanObject = createIfNull(beanObject, beanClass);
+				beanObject = createIfNull(beanClass);
 			}
 		} catch (Exception e) {
 			throw new BeanCreationFailedException("Bean Creation Failed,must be on args Constructor", e);
@@ -33,11 +31,8 @@ public class ConfigurationPropertiesBeanFactory implements BeanFactory {
 		return beanObject;
 	}
 
-	private Object createIfNull(Object config, Class<?> type) throws Exception {
-		if (config != null) {
-			initNestedObjects(config);
-			return config;
-		}
+	private Object createIfNull(Class<?> type) throws Exception {
+		
 		Object instance = type.getDeclaredConstructor().newInstance();
 		initNestedObjects(instance);
 		return instance;

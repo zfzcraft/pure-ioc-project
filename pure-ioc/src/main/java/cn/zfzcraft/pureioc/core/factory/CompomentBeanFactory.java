@@ -14,9 +14,9 @@ public class CompomentBeanFactory implements BeanFactory{
 	@Override
 	public Object createBean(ApplicationContext applicationContext, AnnotatedElement beanElement) {
 		Class<?> beanClass = (Class<?>) beanElement;
-		Constructor<?>[] constructors = beanClass.getConstructors();
+		Constructor<?>[] constructors = beanClass.getDeclaredConstructors();
 		if (constructors.length>1) {
-			throw new TooManyConstructorsException("Class "+beanClass.getName()+" has too many constructors. Only one constructor is allowed.");
+			throw new TooManyConstructorsException("Class "+beanClass.getName()+" has too many Declared Constructors. Only one Declared Constructor is allowed.");
 		}
 		Constructor<?> ctor = constructors[0];
 		Object[] args = resolveArgs(applicationContext,ctor.getParameterTypes());
@@ -24,7 +24,7 @@ public class CompomentBeanFactory implements BeanFactory{
 			Object instance = ctor.newInstance(args);
 			return instance;
 		} catch (Exception e) {
-			throw new BeanCreationFailedException("Class "+beanClass.getName()+" failed to reate Bean.",e);
+			throw new BeanCreationFailedException("Class "+beanClass.getName()+" failed to create Bean.",e);
 		}
 	}
 	
