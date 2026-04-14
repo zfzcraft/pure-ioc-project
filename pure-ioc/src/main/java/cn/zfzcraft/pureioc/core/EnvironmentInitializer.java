@@ -9,13 +9,12 @@ import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
+import cn.zfzcraft.pureioc.annotations.ConfigurationProperties;
 import cn.zfzcraft.pureioc.core.exception.IgnoreException;
 import cn.zfzcraft.pureioc.utils.NestedMapUtils;
 import cn.zfzcraft.pureioc.utils.ResourceUtils;
 
 public class EnvironmentInitializer {
-
-	private static final String ENV = "env";
 
 	private static final String EMPTY = "";
 
@@ -128,7 +127,8 @@ public class EnvironmentInitializer {
 	}
 
 	private static String determineActiveProfile(Map<String, Object> env) {
-		EnvironmentProperties environmentProperties = NestedMapUtils.loadAs(env, ENV, EnvironmentProperties.class);
+		String prefix = EnvironmentProperties.class.getAnnotation(ConfigurationProperties.class).prefix();
+		EnvironmentProperties environmentProperties = NestedMapUtils.loadAs(env, prefix, EnvironmentProperties.class);
 		String active = environmentProperties.getActive();
 		return active == null ? null : active.trim();
 	}
